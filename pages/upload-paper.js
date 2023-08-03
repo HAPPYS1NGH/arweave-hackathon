@@ -25,6 +25,8 @@ const UploadFile = () => {
 
   const handleFileChange = async (event) => {
     event.preventDefault();
+    setProcessingMessage("");
+    setError("")
     const file = event.target.files[0];
     if (file && file.type === "application/pdf") {
       setSelectedFile(file);
@@ -36,7 +38,7 @@ const UploadFile = () => {
       setError(null);
       const formData = new FormData();
       formData.append("file", fileInputRef.current.files[0]);
-      setProcessingMessage("Contacting Open AI, please wait....");
+      setProcessingMessage("processing document please wait....");
       const response = await fetch("/api/upload", {
         method: "POST",
         body: formData,
@@ -50,21 +52,25 @@ const UploadFile = () => {
         delete data.filepath;
         //build the tags here
         const content = { name: "Content-Type", value: "application/pdf" };
-        const publishIn = { name: "publishIn", value: data.journal_name };
-        const title = { name: "title", value: data.title };
-        const abstract = { name: "abstract", value: data.abstract };
-        const keywords = { name: "keywords", value: data.keywords };
-        const field = { name: "field", value: data.field };
-        const author = { name: "author", value: "" };
-        const metaData = [
-          content,
-          publishIn,
-          title,
-          abstract,
-          keywords,
-          field,
-          author,
-        ];
+        const abstract = {
+          name: "abstract",
+          value: data.abstract ? data.abstract : "",
+        };
+        const title = { name: "title", value: data.title ? data.title : "" };
+        const keywords = {
+          name: "keywords",
+          value: data.keywords ? data.keywords : "",
+        };
+        const field = { name: "field", value: data.field ? data.field : "" };
+        const author = {
+          name: "author",
+          value: data.author ? data.author : "",
+        };
+        const publishIn = {
+          name: "publishIn",
+          value: data.journal_name ? data.journal_name : "",
+        };
+        const metaData = [content, publishIn, title, keywords, field, author, abstract];
         setTags(metaData);
         setData(data);
       } else {
@@ -89,7 +95,7 @@ const UploadFile = () => {
     try {
       setError(null);
       setProcessing(true);
-      setProcessingMessage("Uploading document to Arweave please wait");
+      setProcessingMessage("Uploading document to Arweave please wait....");
       const response = await fetch("/api/uploadFromServer", {
         method: "POST",
         body: JSON.stringify({
@@ -105,6 +111,8 @@ const UploadFile = () => {
       );
       console.log(data); // Log the response from the API
       setData(null);
+      fileInputRef.current.value = null;
+      setSelectedFile(null);
     } catch (error) {
       setError(error.message);
       console.log("error ", error);
@@ -157,11 +165,7 @@ const UploadFile = () => {
             <div className="mt-4">
               {data && (
                 <div>
-                  <p className="mb-4">
-                    <span className="font-bold">file path</span>{" "}
-                    <span className="ml-2">{filepath}</span>
-                  </p>
-
+                
                   <p className="mb-4">
                     <span className="font-bold">Author Name</span>{" "}
                     <span className="ml-2">{data["author"]}</span>

@@ -9,17 +9,15 @@ const __getBundlrClient = () => {
   const bundlr = new Bundlr(
     "https://node1.bundlr.network",
     "arweave",
-    ARWEAVE_KEY,
-    {
-      providerUrl: "https://rpc-mumbai.maticvigil.com",
-    }
+    ARWEAVE_KEY
+    // {
+    //   providerUrl: "https://rpc-mumbai.maticvigil.com",
+    // }
   );
   // Print your wallet address
   console.log(`wallet address = ${bundlr.address}`);
   return bundlr;
 };
-
-
 
 const fundBundlr = async (amountInAtomicUnits) => {
   const bundlr = __getBundlrClient();
@@ -36,9 +34,8 @@ const lazyFundNode = async (size) => {
 const uploadFileToArweave = async (filepath, tags) => {
   const bundlr = __getBundlrClient();
   console.log("filepath ", filepath);
-  const file = fs.readFileSync(filepath)
-  console.log("tags ", tags)
-  const { id } = await bundlr.uploadWithReceipt(file, tags);
+  const file = fs.readFileSync(filepath);
+  const { id } = await bundlr.uploadWithReceipt(file, { tags });
   console.log("file uploaded to ", `https://arweave.net/${id}`);
   return id;
 };
@@ -48,10 +45,11 @@ export default async function handler(req, res) {
   try {
     const { filepath, metadata } = JSON.parse(req.body);
     const { size } = await fs.promises.stat(filepath);
-    console.log("file size ", size)
+    console.log("file size ", size);
     await lazyFundNode(size);
+    console.log("meta data ", metadata);
     const transId = await uploadFileToArweave(filepath, metadata);
-    //fs.unlinkSync(filepath);
+    fs.unlinkSync(filepath);
     res.status(200).json(transId);
   } catch (error) {
     console.log("error ", error);
