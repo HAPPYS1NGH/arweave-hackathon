@@ -39,8 +39,6 @@ const handler = async (req, res) => {
     const host = req.headers.origin;
     const response = await axios.post(`${host}/api/checkFileContentWithAI`, {
       pdfString: pdfData.text,
-      filePath: filepath,
-      fields: fields,
     });
 
     console.log("response ", response.data);
