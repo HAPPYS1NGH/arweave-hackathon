@@ -1,7 +1,7 @@
 import Head from "next/head";
 import Image from "next/image";
 import { Inter } from "next/font/google";
-import Hero from "../components";
+import Hero from "../components/Hero";
 import Slider from "@/components/Slider";
 import { SliderData } from "../components/SliderData";
 
@@ -21,7 +21,6 @@ export default function Home() {
         message=" store your academic paper on the permaweb and get rewarded by your audience"
       />
 
-      <h1>HOME PAGE</h1>
     </>
   );
 }

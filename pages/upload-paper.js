@@ -26,7 +26,7 @@ const UploadFile = () => {
   const handleFileChange = async (event) => {
     event.preventDefault();
     setProcessingMessage("");
-    setError("")
+    setError("");
     const file = event.target.files[0];
     if (file && file.type === "application/pdf") {
       setSelectedFile(file);
@@ -51,6 +51,10 @@ const UploadFile = () => {
         setFilepath(data.filepath);
         delete data.filepath;
         //build the tags here
+        const applicationName = {
+          name: "application-name",
+          value: "arweave-hackathon",
+        };
         const content = { name: "Content-Type", value: "application/pdf" };
         const abstract = {
           name: "abstract",
@@ -70,7 +74,16 @@ const UploadFile = () => {
           name: "publishIn",
           value: data.journal_name ? data.journal_name : "",
         };
-        const metaData = [content, publishIn, title, keywords, field, author, abstract];
+        const metaData = [
+          content,
+          publishIn,
+          title,
+          keywords,
+          field,
+          author,
+          abstract,
+          applicationName,
+        ];
         setTags(metaData);
         setData(data);
       } else {
@@ -83,6 +96,8 @@ const UploadFile = () => {
     } finally {
       setLoading(false);
       setProcessingMessage(null);
+      fileInputRef.current.value = null;
+      setSelectedFile(null);
     }
   };
 
@@ -122,7 +137,7 @@ const UploadFile = () => {
   };
 
   return (
-    <div>
+    <div className="h-screen">
       <div className="flex justify-center items-center">
         {error && <ErrorDiv message={error} />}
       </div>
@@ -131,7 +146,7 @@ const UploadFile = () => {
         {processingMessage && <MessageDiv message={processingMessage} />}
       </div>
 
-      <div className="h-screen flex justify-center items-center">
+      <div className="flex justify-center items-center mt-20">
         <div className="w-full max-w-5xl flex">
           <div className="w-1/2 h-96 p-4">
             <div className="mt-4">
@@ -165,38 +180,37 @@ const UploadFile = () => {
             <div className="mt-4">
               {data && (
                 <div>
-                
-                  <p className="mb-4">
+                  <p className="mb-4 mb-4 bg-gray-200 p-2">
                     <span className="font-bold">Author Name</span>{" "}
                     <span className="ml-2">{data["author"]}</span>
                   </p>
 
-                  <p className="mb-4">
+                  <p className="mb-4 mb-4 bg-gray-200 p-2">
                     <span className="font-bold">Journal Name</span>{" "}
                     <span className="ml-2">{data["journal_name"]}</span>
                   </p>
 
-                  <p className="mb-4">
+                  <p className="mb-4 mb-4 bg-gray-200 p-2">
                     <span className="font-bold">Paper Title</span>{" "}
                     <span className="ml-2">{data["title"]}</span>
                   </p>
 
-                  <p className="mb-4">
+                  <p className="mb-4 mb-4 bg-gray-200 p-2">
                     <span className="font-bold">Abstract</span>{" "}
                     <span className="ml-2">{data["abstract"]}</span>
                   </p>
 
-                  <p className="mb-4">
+                  <p className="mb-4 bg-gray-200 p-2">
                     <span className="font-bold">Paper Field: </span>{" "}
                     <span className="ml-2">{data["field"]}</span>
                   </p>
 
-                  <p className="mb-4">
+                  <p className="mb-4 mb-4 bg-gray-200 p-2">
                     <span className="font-bold">Keywords</span>{" "}
                     <span className="ml-2">{data["keywords"]}</span>
                   </p>
 
-                  <p className="mb-4">
+                  <p className="mb-4 mb-4 bg-gray-200 p-2">
                     <span className="font-bold">Publication Date: </span>{" "}
                     <span className="ml-2">{data["publication_date"]}</span>
                   </p>
@@ -205,7 +219,7 @@ const UploadFile = () => {
                     <button
                       onClick={paperUploadViaServer}
                       disabled={processing}
-                      className="bg-green-500 mb-4 text-black font-bold py-2 px-4 rounded-full hover:bg-lightBlue-600 focus:outline-none focus:ring-2 focus:ring-lightBlue-400 focus:ring-opacity-75"
+                      className="bg-green-500 mb-2 text-black font-bold py-2 px-4 rounded-full hover:bg-lightBlue-600 focus:outline-none focus:ring-2 focus:ring-lightBlue-400 focus:ring-opacity-75"
                     >
                       {processing ? <Spinner /> : "Upload paper to Arweave"}
                     </button>
