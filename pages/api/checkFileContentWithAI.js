@@ -1,17 +1,16 @@
 const axios = require("axios");
 
-
 const keys = [process.env.API_KEY1, process.env.API_KEY2, process.env.API_KEY3];
 
 console.log("keys ", keys);
 
 export default async function handler(req, res) {
-  const { pdfString, filePath, fields } = req.body;
+  const { pdfString } = req.body;
   const wordsArray = pdfString.trim().split(/\s+/);
   const first2000Words = wordsArray.slice(0, 2200);
   //const last1000Words = wordsArray.slice(-500);
   let extractedpdfString = first2000Words.join(" ");
-  console.log("words ", extractedpdfString)
+  console.log("words ", extractedpdfString);
   const prompt = `Your task is to take this string and indetify if the string is from an academic paper \n\n
   you are to analyze the string for the following patterns \\n
   Techncal and formal language \n
@@ -22,7 +21,7 @@ export default async function handler(req, res) {
   
   If the document meets 50% of the listed pattern it is an academic document \n
   
-  If it is academic extract the journal name, title, author, publication date, abstract and keywords in this format;
+  If it is academic extract the field the paper is written on, journal name, title, author, publication date, abstract and keywords in this format;
   
   <p>journal_name: extracted journal name</p>
   <p>title: extrated title </p>;
@@ -30,6 +29,7 @@ export default async function handler(req, res) {
   <p>abstract: extracted abstract should contain all the abstract </p>;
   <p>keywords: extracted keywords </p>;
   <p>publication_date: publication date </p>;
+  <p>field: extracted field the paper is written on </p>;
  
   use exactly the given format above .If the document is not academic say \n\n
   This is not an academic document. Here comes the string;
@@ -136,23 +136,9 @@ const filterResultToReturn = (resultData) => {
       data: {},
     };
     for (let i = 0; i < splitText.length; i++) {
-      // if (i < 5) {
-        const item = splitText[i].split(":");
-        obj["data"][item[0]] = item[1];
-      //}
-      // if (i > 5) {
-      //   const item = splitText[i];
-      //   if (obj["data"]["references"]) {
-      //     const array = obj["data"]["references"];
-      //     const newArray = [...array, item];
-      //     obj["data"]["references"] = newArray;
-      //   } else {
-      //     obj["data"]["references"] = [item];
-      //   }
-      // }
+      const item = splitText[i].split(":");
+      obj["data"][item[0]] = item[1];
     }
     return obj;
   }
 };
-
-

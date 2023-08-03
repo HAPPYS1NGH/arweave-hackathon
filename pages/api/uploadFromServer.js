@@ -7,9 +7,9 @@ const ARWEAVE_KEY = { kty, n, e, d, p, q, dp, dq, qi };
 
 const __getBundlrClient = () => {
   const bundlr = new Bundlr(
-    "https://devnet.bundlr.network",
-    "matic",
-    Private_Key,
+    "https://node1.bundlr.network",
+    "arweave",
+    ARWEAVE_KEY,
     {
       providerUrl: "https://rpc-mumbai.maticvigil.com",
     }
@@ -36,8 +36,10 @@ const lazyFundNode = async (size) => {
 const uploadFileToArweave = async (filepath, tags) => {
   const bundlr = __getBundlrClient();
   console.log("filepath ", filepath);
-  const { id } = await bundlr.uploadFile(filepath, tags);
-  console.log("file uploaded to ", `https://devnet.bundlr.netwok/tx/${id}`);
+  const file = fs.readFileSync(filepath)
+  console.log("tags ", tags)
+  const { id } = await bundlr.uploadWithReceipt(file, tags);
+  console.log("file uploaded to ", `https://arweave.net/${id}`);
   return id;
 };
 
