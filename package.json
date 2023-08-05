@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@apollo/client": "^3.7.17",
     "@bundlr-network/client": "^0.11.9",
     "@walletconnect/web3-provider": "^1.8.0",
     "@web3modal/ethereum": "^2.7.1",
@@ -21,6 +22,7 @@
     "filereader-stream": "^2.0.0",
     "flowbite": "^1.8.1",
     "formidable": "^3.5.0",
+    "graphql": "^16.7.1",
     "next": "13.4.12",
     "next-connect": "^1.0.0",
     "pdf-parse": "^1.1.1",
