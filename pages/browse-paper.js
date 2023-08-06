@@ -2,6 +2,7 @@ import React from "react";
 import Head from "next/head";
 import { gql, useQuery } from "@apollo/client";
 import { Get_Document_Uploaded_By_APP } from "../graphql/queries";
+import Paper from "@/components/Paper";
 
 const BrowsePaper = () => {
   <Head>
@@ -22,20 +23,33 @@ const BrowsePaper = () => {
   if (error) return `Error! ${error.message}`;
 
   return (
-    <div className="h-screen mt-16">
-      <div className="flex justify-center items-center">
-        <div className="w-1/2">
-          <div className="mt-4">
-            <p className="text-center">Uploaded Papers</p>
-            {data &&
-              data.transactions.edges.map(({ node }, index) =>
-                
-                node.tags.map(({ name, value }, p) => {
-                  if (name === "title") {
-                    return <a key={p} href={`/paper/${node.id}`}>{value.toUpperCase()}</a>;
-                  }
-                })
-              )}
+    <div className="min-h-screen bg-gray-100 pt-16">
+      <div className="container mx-auto">
+        <div className="flex items-center">
+          <div className="w-3/4">
+            <div className="mt-4 p-5">
+              <h1 className="text-3xl font-semibold  mb-10">
+                Browse the Uploaded Papers
+              </h1>
+              {data &&
+                data.transactions.edges.map(({ node }, index) => (
+                  <div key={index} className="mb-4">
+                    {node.tags.map(({ name, value }, p) => {
+                      if (name === "title") {
+                        return (
+                          <div key={p}>
+                            <Paper
+                              id={node.id}
+                              title={value}
+                              author={node.address}
+                            />
+                          </div>
+                        );
+                      }
+                    })}
+                  </div>
+                ))}
+            </div>
           </div>
         </div>
       </div>
