@@ -1,9 +1,14 @@
 import { ApolloClient, InMemoryCache } from "@apollo/client";
-import { GetDocumentByTransactionID } from "../../../graphql/queries";
+import {
+  GetDocumentByTransactionID,
+  GetPaperComments,
+} from "../../../graphql/queries";
 import { useEffect, useState } from "react";
+import CommentBox from "../../../components/Comment";
+import CommentDisplay from "@/components/CommentDisplay";
 import Head from "next/head";
 
-const PaperDetailsPage = ({ paper, error, paperId }) => {
+const PaperDetailsPage = ({ paper, error, paperId, comments }) => {
   <Head>
     <title>Paper Details</title>
     <meta name="description" content="Paper details" />
@@ -19,9 +24,28 @@ const PaperDetailsPage = ({ paper, error, paperId }) => {
   const [publishIn, setPublishIn] = useState("");
   const [timestamp, setTimestamp] = useState(null);
   const [address, setAddress] = useState("");
+  const [paperComments, setPaperComments] = useState(null);
 
   useEffect(() => {
+    let commentsArray = [];
+    if (comments) {
+      comments.map(({ node: { tags, timestamp } }) => {
+        const obj = {};
+        obj.time = timestamp;
+        console.log("comment nodes ", tags, timestamp);
+        tags.map(({ name, value }) => {
+          if (name == "name") {
+            obj.name = value;
+          } else if (name == "comment") {
+            obj.content = value;
+          }
+        });
+        commentsArray.push(obj);
+      });
+      setPaperComments(commentsArray);
+    }
     if (paper) {
+      console.log("comments : ", comments);
       setTimestamp(paper.timestamp);
       setAddress(paper.address);
       paper.tags.map(({ name, value }) => {
@@ -86,6 +110,10 @@ const PaperDetailsPage = ({ paper, error, paperId }) => {
             </a>
           </div>
         </div>
+
+        {paperComments && <CommentDisplay comments={paperComments} />}
+
+        {paperId && <CommentBox transactionID={paperId} />}
       </div>
     </div>
   );
@@ -102,17 +130,36 @@ const client = new ApolloClient({
 export const getServerSideProps = async (context) => {
   const { tx } = context.query;
   try {
-    const { data } = await client.query({
-      query: GetDocumentByTransactionID,
-      variables: {
-        ids: tx,
-        ssr: true,
-      },
-    });
+    const [paper, comments] = await Promise.all([
+      client.query({
+        query: GetDocumentByTransactionID,
+        variables: {
+          ids: tx,
+          ssr: true,
+        },
+      }),
+
+      client.query({
+        query: GetPaperComments,
+        variables: {
+          tags: [
+            {
+              name: "txID",
+              values: tx,
+            },
+          ],
+          order: "DESC",
+          ssr: true,
+        },
+      }),
+    ]);
+
+    console.log("comments data ", comments && comments.data.transactions);
 
     return {
       props: {
-        paper: data.transactions.edges[0].node,
+        paper: paper && paper.data.transactions.edges[0].node,
+        comments: comments && comments.data.transactions.edges,
         paperId: tx,
         error: null,
       },
@@ -122,6 +169,7 @@ export const getServerSideProps = async (context) => {
       props: {
         paper: null,
         paperId: null,
+        comments: null,
         error: "Paper not found",
       },
     };
