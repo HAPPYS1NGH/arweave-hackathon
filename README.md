@@ -25,6 +25,10 @@ qi =
 `end of private key of an Arweave wallet`
 
 ```bash
+npm install
+```
+
+```bash
 npm run dev
 # or
 yarn dev
