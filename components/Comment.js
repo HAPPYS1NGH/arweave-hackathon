@@ -1,9 +1,27 @@
 import React, { useState } from "react";
+import axios from "axios";
 
-const CommentBox = ({ transactionID }) => {
+
+
+const CommentBox = ({ transactionID, reloadComment }) => {
   const [name, setName] = useState("");
   const [comment, setComment] = useState("");
   const [processing, setProcessing] = useState(false);
+
+  const reloadQuery = `query ($tags: [TagFilter!], $order: SortOrder) {
+    transactions(tags: $tags, order: $order) {
+      edges {
+        node {
+          timestamp
+          address
+          tags {
+            name
+            value
+          }
+        }
+      }
+    }
+  }`
 
   const saveComment = async () => {
     if (!name && !comment) {
@@ -36,12 +54,28 @@ const CommentBox = ({ transactionID }) => {
       // The API response
       const tx = await response.json();
       alert(`comment uploaded to : https://arweave.net/${tx}`);
+      const responseData = await axios.post("https://node1.bundlr.network/graphql", {
+        query: reloadQuery,
+        variables: {
+          tags: [
+            {
+              name: "txID",
+              values: transactionID,
+            },
+          ],
+          order: "DESC"
+        },
+      });
+      console.log("response ", responseData.data.data.transactions.edges);
+      let comments = responseData.data.data.transactions.edges
+      reloadComment(comments)
       setProcessing(false);
       setComment("");
       setName("");
-    } catch (error) {
+    } catch (e) {
       alert("Error : ", e.message);
       console.log("Error saving comment ", e);
+      setProcessing(false);
     }
   };
   return (

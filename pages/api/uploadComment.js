@@ -28,6 +28,7 @@ export default async function handler(req, res) {
   try {
     const { commentData, metadata } = JSON.parse(req.body);
     const transId = await uploadFileToArweave(commentData, metadata);
+    //
     res.status(200).json(transId);
   } catch (error) {
     console.log("error ", error);

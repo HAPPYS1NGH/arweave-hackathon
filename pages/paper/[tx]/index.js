@@ -26,6 +26,26 @@ const PaperDetailsPage = ({ paper, error, paperId, comments }) => {
   const [address, setAddress] = useState("");
   const [paperComments, setPaperComments] = useState(null);
 
+  const reloadComment = (comments) => {
+    let commentsArray = [];
+    if (comments) {
+      comments.map(({ node: { tags, timestamp } }) => {
+        const obj = {};
+        obj.time = timestamp;
+        console.log("comment nodes ", tags, timestamp);
+        tags.map(({ name, value }) => {
+          if (name == "name") {
+            obj.name = value;
+          } else if (name == "comment") {
+            obj.content = value;
+          }
+        });
+        commentsArray.push(obj);
+      });
+      setPaperComments(commentsArray);
+    }
+  };
+
   useEffect(() => {
     let commentsArray = [];
     if (comments) {
@@ -113,7 +133,9 @@ const PaperDetailsPage = ({ paper, error, paperId, comments }) => {
 
         {paperComments && <CommentDisplay comments={paperComments} />}
 
-        {paperId && <CommentBox transactionID={paperId} />}
+        {paperId && (
+          <CommentBox transactionID={paperId} reloadComment={reloadComment} />
+        )}
       </div>
     </div>
   );
