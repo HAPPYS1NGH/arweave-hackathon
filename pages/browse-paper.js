@@ -23,10 +23,10 @@ const BrowsePaper = () => {
   if (error) return `Error! ${error.message}`;
 
   return (
-    <div className="min-h-screen bg-gray-100 pt-16">
+    <div className="min-h-screen  pt-16">
       <div className="container mx-auto">
         <div className="flex items-center">
-          <div className="w-3/4">
+          <div className="">
             <div className="mt-4 p-5">
               <h1 className="text-3xl font-semibold  mb-10">
                 Browse the Uploaded Papers
@@ -34,19 +34,11 @@ const BrowsePaper = () => {
               {data &&
                 data.transactions.edges.map(({ node }, index) => (
                   <div key={index} className="mb-4">
-                    {node.tags.map(({ name, value }, p) => {
-                      if (name === "title") {
-                        return (
-                          <div key={p}>
-                            <Paper
-                              id={node.id}
-                              title={value}
-                              author={node.address}
-                            />
-                          </div>
-                        );
-                      }
-                    })}
+                    <Paper
+                      id={node.id}
+                      tags={node.tags}
+                      author={node.address}
+                    />
                   </div>
                 ))}
             </div>
